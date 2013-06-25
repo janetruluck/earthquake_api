@@ -2,7 +2,7 @@
 class ImportJob
   @queue = :import
 
-  def self.perform(wait_time)
+  def self.perform(wait_time = 1)
     # wait 1 minute to run, this can be
     # improved by using resque_scheduler or cron
     sleep(wait_time.minute)

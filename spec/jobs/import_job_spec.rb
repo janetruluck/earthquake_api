@@ -16,4 +16,18 @@ describe ImportJob do
       Earthquake.all.should_not be_empty
     end
   end
+
+  describe "wait time arguement passed" do
+    it "Queues a jobe with the passed wait time" do 
+      Resque.enqueue(ImportJob, 5)
+      ImportJob.should have_queued(5)
+    end
+  end
+
+  describe "no wait time argument passed" do
+    it "Queues a job with a 1 minute wait" do
+      Resque.enqueue(ImportJob)
+      ImportJob.should have_queued
+    end
+  end
 end
