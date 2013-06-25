@@ -12,6 +12,9 @@ require "./config/environments"
 require "./app/models/earthquake"
 require "./app/jobs/import_job"
 
+# Set the views directory under app
+set :views, settings.root + '/app/views'
+
 # Configure instance for redis & resque
 configure do
   if settings.production?
@@ -24,7 +27,7 @@ end
 
 # Provide information about the api
 get "/" do
-  "Earthquake API v0.1\nTracking #{Earthquake.all.count} earthquakes."
+  haml :index
 end
 
 # Query the api
