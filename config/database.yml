@@ -1,0 +1,6 @@
+development:
+  adapter:  postgresql
+  database: earthquake_development
+  username: deploy
+  password: 
+  host:     localhost
