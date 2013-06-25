@@ -8,6 +8,7 @@ gem 'sinatra-activerecord'
 gem 'resque'
 gem 'sinatra-redis'
 gem 'json'
+gem 'haml'
 
 group :test do
   gem 'rspec'

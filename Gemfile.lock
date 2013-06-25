@@ -21,6 +21,8 @@ GEM
     diff-lcs (1.2.4)
     factory_girl (4.2.0)
       activesupport (>= 3.0.0)
+    haml (4.0.2)
+      tilt
     i18n (0.6.1)
     json (1.8.0)
     json_spec (1.1.1)
@@ -88,6 +90,7 @@ DEPENDENCIES
   activerecord
   database_cleaner
   factory_girl
+  haml
   json
   json_spec
   pg
