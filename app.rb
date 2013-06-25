@@ -28,7 +28,7 @@ get "/" do
 end
 
 # Query the api
-get "/earthquakes" do
+get "/earthquakes.json" do
   @earthquakes = Earthquake.filter(params)
   # Convert result to JSON with the number of results
   { :count => @earthquakes.count, :results => @earthquakes }.to_json
@@ -38,5 +38,5 @@ end
 # This also queues up a recurring job if non exists
 get "/import" do
   Earthquake.import
-  redirect "/earthquakes"
+  redirect "/earthquakes.json"
 end

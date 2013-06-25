@@ -12,7 +12,7 @@ describe "Earthquake App" do
   end
 
   it "responds to GET /earthquakes" do
-    get "/earthquakes"
+    get "/earthquakes.json"
     last_response.should be_ok
   end
 
