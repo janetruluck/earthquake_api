@@ -24,7 +24,7 @@ class Earthquake < ActiveRecord::Base
     "magnitude",
     "depth",
     "nst",
-    "region",
+    "region"
   ] + METHOD_PARAMS
 
   # Class methods
@@ -62,80 +62,69 @@ class Earthquake < ActiveRecord::Base
     end
 
     def filter(params)
-      allowed_params = clean_params(params)
-      query = join_queries(
-        generate_custom_queries(allowed_params) +
-        generate_normal_queries(allowed_params)
-      )
-      where(query.to_s)
+      clean_params(params)
+      on.since.over.near.normal
     end
 
+    # #normal
+    #
+    #  Scope for normal query params 
+    def normal
+      @clean_params.blank? ? scoped : where(@clean_params.map{|k,v| "#{k}=#{ActiveRecord::Base.sanitize(v)}"}.join(" AND "))
+    end
+
+    # #on
+    #
+    # Scope for earthquakes on the day specified
+    def on
+      query = @clean_params.delete("on")
+      if query.nil?
+        scoped
+      else
+        start_time  = Time.at(query.to_i).beginning_of_day.to_i
+        end_time    = Time.at(query.to_i).end_of_day.to_i
+        where("occured_at > ? AND occured_at < ?", start_time , end_time)
+      end
+    end
+
+    # .since
+    #
+    # Scope for earthquakes since the day specified
+    def since
+      query = @clean_params.delete("since")
+      query.nil? ? scoped : where("occured_at > ?", query)
+    end
+
+    # .over
+    #
+    # Scope for earthquakes with a magnitude over the specified magnitude
+    def over
+      query = @clean_params.delete("over")
+      query.nil? ? scoped : where("magnitude > ?", query)
+    end
+
+    # .near
+    #
+    # Scope for earthquakes within 5 miles of the coordinates specified
+    def near
+      query = @clean_params.delete("near")
+      if query.nil?
+        scoped
+      else
+        lat, lng = query.split(",") 
+        where("latitude >= #{lat.to_f - 5} AND latitude <= #{lat.to_f + 5} AND longitude >= #{lng.to_f - 5} AND longitude <= #{lng.to_f + 5}")
+      end
+    end
 
     private
-    def join_queries(queries)
-      queries.join(" AND ")
-    end
-
-    def generate_normal_queries(params)
-      queries = Array.new
-      queries.push(params.map{|k,v| "#{k}=#{ActiveRecord::Base.sanitize(v)}"}) unless params.empty?
-      queries
-    end
-    #
-    # General query method to expose private methods
-    def generate_custom_queries(params)
-      queries = Array.new
-      METHOD_PARAMS.each do |param|
-        value = params.delete(param)
-        queries.push(send("#{param}_query".to_sym, value)) unless value.nil?
-      end
-      queries
-    end
     #
     #.clean_params
     #
     # Cleans the parameters passed in by the user
     #
-    # @params parameter the user wantst to query the database for
+    # @params parameter the user wants to query the database for
     def clean_params(params) 
-      params.select{ |k,v| ALLOWED_PARAMS.include?(k.downcase) }
-    end
-
-    # .on
-    #
-    # Generate a sql query string for the on parameter
-    #
-    # @params query the time in unix format to reference the day from
-    def on_query(query)
-      "occured_at > #{Time.at(query.to_i).beginning_of_day.to_i} AND occured_at < #{Time.at(query.to_i).end_of_day.to_i}"
-    end
-
-    # .since
-    #
-    # Generate a sql query string for the since parameter
-    #
-    # @params query the time in unix format
-    def since_query(query)
-      "occured_at > #{query}"
-    end
-
-    # .over
-    #
-    # Generate a sql query string for the magnitude parameter
-    #
-    # @params query the magnitude to filter by
-    def over_query(query)
-      "magnitude > #{query}"
-    end
-
-    # .near
-    #
-    # Generate a sql query string for the near parameter
-    #
-    # @params query the coordinates [lat,lng] to filter by
-    def near_query(query)
-      lat, lng = query.split(",")
-      "latitude >= #{lat.to_f - 5} AND latitude <= #{lat.to_f + 5} AND longitude >= #{lng.to_f - 5} AND longitude <= #{lng.to_f + 5}"
+      @clean_params = params.select{ |k,v| ALLOWED_PARAMS.include?(k.downcase) }
     end
   end
 end
