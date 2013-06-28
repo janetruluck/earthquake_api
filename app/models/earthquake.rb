@@ -1,10 +1,13 @@
 # Earthquake.rb
 class Earthquake < ActiveRecord::Base
+  extend Geocoder::Model::ActiveRecord
   # define accessible attributes
   attr_accessible :source, :eqid, :version, :occured_at, :latitude, :longitude, :magnitude, :depth, :nst, :region
 
   # Validate the earthquake is unique via its earthquake id
   validates :eqid, :uniqueness => true
+
+  reverse_geocoded_by :latitude, :longitude
 
   # Denote params that require special sql
   METHOD_PARAMS = [
@@ -29,6 +32,9 @@ class Earthquake < ActiveRecord::Base
 
   # Class methods
   class << self
+    # Alias near method to overload for use in scope w/o params
+    alias :old_near :near
+
     # .import
     #
     # Import data from a remote source, defaults to USGS
@@ -108,12 +114,7 @@ class Earthquake < ActiveRecord::Base
     # Scope for earthquakes within 5 miles of the coordinates specified
     def near
       query = @clean_params.delete("near")
-      if query.nil?
-        scoped
-      else
-        lat, lng = query.split(",") 
-        where("latitude >= #{lat.to_f - 5} AND latitude <= #{lat.to_f + 5} AND longitude >= #{lng.to_f - 5} AND longitude <= #{lng.to_f + 5}")
-      end
+      query.nil? ? scoped :  old_near(query.split(",").map{ |x| x.to_f }, 5)
     end
 
     private

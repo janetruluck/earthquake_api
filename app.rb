@@ -7,6 +7,7 @@ require "resque"
 require "open-uri"
 require "csv"
 require "time"
+require "geocoder"
 require "active_support/core_ext/time/calculations" # require for time for conversions on "on" calls
 require "./config/environments"
 require "./app/models/earthquake"

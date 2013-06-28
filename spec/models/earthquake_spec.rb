@@ -79,18 +79,18 @@ describe Earthquake do
     end
 
     context "near filter passed" do
-      let(:result) { Earthquake.filter({"near" => "38.7447,-122.6942" }) }
+      let(:result) { Earthquake.filter({"near" => "38.8245, -122.8037" }) }
 
       it "returns the quakes on the same day" do
-        result.count.should  eq(2)
+        result.count.should  eq(1)
       end
     end
 
     context "multiple filters passed" do
-      let(:result) { Earthquake.filter({"near" => "38.7447,-122.6942", "over" => "1.2" }) }
+      let(:result) { Earthquake.filter({"near" => "38.8245, -122.8037", "over" => "1.2" }) }
 
       it "returns the quakes on the same day" do
-        result.count.should  eq(2)
+        result.count.should  eq(1)
       end
     end
   end
