@@ -9,6 +9,7 @@ gem 'resque'
 gem 'sinatra-redis'
 gem 'json'
 gem 'haml'
+gem 'geocoder'
 
 group :test do
   gem 'rspec'
